@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static Bank.Account;
 
 
 // Modificadores de acesso
@@ -34,5 +33,11 @@ using static Bank.Account;
 
 namespace Bank // namespace é como se fosse uma pasta virtual que agrupa teu projeto em uma coisa só, isso permite diferentes pastas com classes iguais
 {
-   
+   class Program     {
+        static void Main(string[] args)
+        {
+            Bank.Services.BankSystem bankSystem = new Bank.Services.BankSystem();
+            bankSystem.Menu();
+        }
+    }
 }

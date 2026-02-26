@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Bank.Models;
 
 namespace Bank.Services
 {
@@ -18,7 +19,7 @@ namespace Bank.Services
         {
             while (true)
             {
-                Console.WriteLine("Bem-vinde ao sistema que roubará seus anos de vida. Escolha as opções:");
+                Console.WriteLine("==Bem-vinde ao sistema que roubará seus anos de vida. Escolha as opções:==");
                 Console.WriteLine("1- Login");
                 Console.WriteLine("2- Cadastro");
                 Console.WriteLine("0- Sair");
@@ -34,6 +35,7 @@ namespace Bank.Services
                         Cadastro();
                         break;
                     case "0":
+                        // como fechar o programa caso ele digite 0?
                         Console.WriteLine("Programa encerrado");
                         return; // o return encerra a excecução do método/função inteiro 
                     default:
@@ -47,7 +49,7 @@ namespace Bank.Services
 
         public void MenuLogado()
         {
-            Console.WriteLine("Você está logado, o que deseja fazer?");
+            Console.WriteLine("==Você está logado, o que deseja fazer?==");
             Console.WriteLine("1- Ver dados da conta");
             Console.WriteLine("2- Transferir");
             Console.WriteLine("3- Depositar");
@@ -63,6 +65,8 @@ namespace Bank.Services
             {
                 switch (op)
                 {
+
+                    // está repetindo infinitamente
                     case "1":
                         Account conta = Contas.Find(c => c.Titular == UsuarioLogado);
                         if (conta != null)
@@ -146,7 +150,7 @@ namespace Bank.Services
 
             // O usuário deve decidir qual tipo de conta ele quer
             // Ele deve poder voltar para o login
-            Console.WriteLine("Cadastro");
+            Console.WriteLine("==Cadastro==");
             string nome = ValidarNome();
             string cpf = ValidarCPF();
             string email = ValidarEmail();
@@ -157,6 +161,8 @@ namespace Bank.Services
 
             Users novo = new Users(nome, cpf, email, senha, rendamensal, idade, cnpj);
             Account conta = new ContaCorrente(novo);
+            usuarios.Add(novo);
+            Contas.Add(conta);
             Console.WriteLine("Cadastro realizado com sucesso");
             Console.Clear();
             Login();
@@ -164,14 +170,19 @@ namespace Bank.Services
 
         public Users Login()
         {
-            Users user = null;
+            Users user;
             bool autenticado = false;
 
             do
             {
-                Console.WriteLine("Login");
-                Console.WriteLine("CPF: ");
+                Console.WriteLine("==Login==");
+                Console.WriteLine("CPF (Digite 0 para sair): ");
                 string cpf = Console.ReadLine();
+                if (cpf == "0")
+                {
+                    Menu();
+                    return null;
+                }
 
                 Console.WriteLine("Senha: ");
                 string senha = Console.ReadLine();
@@ -233,7 +244,6 @@ namespace Bank.Services
                 nomeValido = !string.IsNullOrWhiteSpace(nome) && nome.All(c => char.IsLetter(c) || char.IsWhiteSpace(c));
                 if (!nomeValido) Console.WriteLine("Nome inválido");
             } while (!nomeValido);
-            Console.Clear();
             return nome;
         }
 
@@ -248,7 +258,6 @@ namespace Bank.Services
                 CPFValido = CPF.Length == 11 && CPF.All(char.IsDigit) && !usuarios.Any(u => u.Cpf == CPF);
                 if (!CPFValido) Console.WriteLine("CPF inválido ou já cadastrado");
             } while (!CPFValido);
-            Console.Clear();
             return CPF;
         }
 
@@ -263,7 +272,6 @@ namespace Bank.Services
                 emailValido = !string.IsNullOrWhiteSpace(email) && email.Contains("@") && email.Contains(".");
                 if (!emailValido) Console.WriteLine("Email inválido");
             } while (!emailValido);
-            Console.Clear();
             return email;
         }
 
@@ -277,7 +285,6 @@ namespace Bank.Services
                 rendaValida = decimal.TryParse(Console.ReadLine(), out renda) && renda >= 0;
                 if (!rendaValida) Console.WriteLine("Renda inválida");
             } while (!rendaValida);
-            Console.Clear();
             return renda;
         }
 
@@ -287,11 +294,15 @@ namespace Bank.Services
             bool idadeValida;
             do
             {
+                // se for menor de idade o programa deve sair do login
                 Console.WriteLine("Digite sua idade: ");
                 idadeValida = int.TryParse(Console.ReadLine(), out idade) && idade >= 18;
-                if (!idadeValida) Console.WriteLine("Você deve ser maior de idade para acessar o sistema");
+                if (!idadeValida) {
+                    Console.WriteLine("Você deve ser maior de idade para acessar o sistema");
+                    break;
+                }
+                
             } while (!idadeValida);
-            Console.Clear();
             return idade;
         }
         private string ValidarCNPJ()
@@ -305,7 +316,6 @@ namespace Bank.Services
                 if (string.IsNullOrEmpty(cnpj)) cnpjValido = true;
                 else cnpjValido = cnpj.Length == 14 && cnpj.All(char.IsDigit);
                 if (!cnpjValido) Console.Write("CNPJ inválido");
-
             } while (!cnpjValido);
             return cnpj;
         }
@@ -319,9 +329,8 @@ namespace Bank.Services
                 Console.WriteLine("Crie uma senha: ");
                 senha = Console.ReadLine();
                 senhaValida = !string.IsNullOrWhiteSpace(senha);
-                if (senhaValida) Console.WriteLine("A senha não pode ser vazia");
+                if (!senhaValida) Console.WriteLine("A senha não pode ser vazia");
             } while (!senhaValida);
-
             return senha;
         }
     }
