@@ -13,8 +13,15 @@ namespace Bank.Models
 
         public override void Sacar(decimal valor)
         {
-            if (valor <= 0 || valor * (1 + taxa_saque) > Saldo) throw new ArgumentException("Valor inválido ou saldo insuficiente"); // o throw lança um erro
-            Saldo -= valor * (1 + taxa_saque);
+            if (valor <= 0 || valor * (1 + taxa_saque) > Saldo)
+            {
+                Console.WriteLine("Valor inválido ou saldo insuficiente");
+            }// o throw lança um erro
+            else
+            {
+
+                Saldo -= valor * (1 + taxa_saque);
+            }
         }
     }
 }

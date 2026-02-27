@@ -14,8 +14,15 @@ namespace Bank.Models
             decimal renda;
             renda = Titular.RendaMensal ?? 0;
 
-            if (valor <= 0 || valor > renda * (1.50m)) throw new ArgumentException("Valor inválido ou supeior ao limite de crédito");
-            Saldo += valor;
+            if (valor <= 0 || valor > renda * (1.50m))
+            {
+                Console.WriteLine("Valor inválido ou supeior ao limite de crédito");
+            }
+            else
+            {
+
+                Saldo += valor;
+            }
         }
     }
 }

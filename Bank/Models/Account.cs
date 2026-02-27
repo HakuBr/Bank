@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Bank.Models
@@ -18,6 +19,7 @@ namespace Bank.Models
         public void Dados()
         {
             //Gere o número da conta usando Geradores Congruentes Lineares
+            //== mostra o tipo de conta ==
             Console.WriteLine($"Número da Conta: ");
             Console.WriteLine($"Titular da Conta: {Titular.Nome}");
             Console.WriteLine($"Saldo: {Saldo}");
@@ -27,21 +29,42 @@ namespace Bank.Models
 
         public virtual void Depositar(decimal valor)
         {
-            if (valor <= 0) throw new ArgumentException("Valor inválido");
-            Saldo += valor;
+            if (valor <= 0)
+            {
+                Console.WriteLine("Valor inválido");
+            }
+            else
+            {
+
+                Saldo += valor;
+            }
         }
 
         public virtual void Sacar(decimal valor)
         {
-            if (valor <= 0 || valor > Saldo) throw new ArgumentException("Valor inválido ou saldo insuficiente");
-            Saldo -= valor;
+            if (valor <= 0 || valor > Saldo)
+            {
+                Console.WriteLine("Valor inválido ou saldo insuficiente");
+            }
+            else
+            {
+                Saldo -= valor;
+            }
+            
         }
 
         public virtual void TransferirPara(Account destino, decimal valor)
         {
-            if (destino == null) throw new ArgumentNullException("Usuário inexistente");
-            Sacar(valor);
-            destino.Depositar(valor);
+            if (destino == null)
+            {
+                Console.WriteLine("Usuário inexistente");
+            }
+            else
+            {
+
+                Sacar(valor);
+                destino.Depositar(valor);
+            }
 
         }
 
@@ -52,8 +75,19 @@ namespace Bank.Models
 
             renda = Titular.RendaMensal ?? 0; // a renda pode ser nula então deve-se tratar esse erro
 
-            if (valor <= 0 || valor > renda * (1.30m)) throw new ArgumentException("Valor inválido ou superior ao limtie de crédito mensal");
-            Saldo += renda * (1.30m);
+            //== adicione o saldo devedor lá em cima como uma variável de dados == 
+           
+
+            if (valor <= 0 || valor > renda * (1.30m))
+            {
+                Console.WriteLine("Valor inválido ou superior ao limtie de crédito mensal");
+            }
+            else
+            {
+                Saldo += valor;
+                Console.WriteLine($"Empréstimo concedido no valor de {valor:C}. \nSaldo atual: {Saldo:C}. \nSaldo devedor: {valor * 1.12m:C}");
+            }
+            
         }
     }
 }

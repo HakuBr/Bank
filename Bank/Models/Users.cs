@@ -6,6 +6,7 @@ namespace Bank.Models
 {
     public class Users
     {
+        //Campos - Representam o estado brutos do objeto
         public string Nome { get; private set; } // Propriedades são métodos especiais para ler, gravar e calcular o valor dos campos da classe (get e set)
         public string Cpf { get; private set; }
         public string Email { get; set; }
