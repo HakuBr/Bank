@@ -9,22 +9,26 @@ namespace Bank.Models
     {
         public Users Titular { get; private set; }
         public decimal Saldo { get; protected set; }
+        public decimal Saldo_devedor { get; protected set; }
+        public abstract string TipoConta { get; }
 
         public Account(Users titular)
         {
             Titular = titular;
             Saldo = 0;
+            Saldo_devedor = 0;
         }
 
         public void Dados()
         {
             //Gere o número da conta usando Geradores Congruentes Lineares
-            //== mostra o tipo de conta ==
             Console.WriteLine($"Número da Conta: ");
             Console.WriteLine($"Titular da Conta: {Titular.Nome}");
             Console.WriteLine($"Saldo: {Saldo}");
+            Console.WriteLine($"Saldo Devedor: {Saldo_devedor}");
             Console.WriteLine($"CPF: {Titular.Cpf}");
-            Console.WriteLine($"email: {Titular.Email}");
+            Console.WriteLine($"Email: {Titular.Email}");
+            Console.WriteLine($"Tipo de Conta: {TipoConta}");
         }
 
         public virtual void Depositar(decimal valor)
@@ -37,6 +41,7 @@ namespace Bank.Models
             {
 
                 Saldo += valor;
+                Console.WriteLine($"Saldo: {Saldo}");
             }
         }
 
@@ -49,6 +54,7 @@ namespace Bank.Models
             else
             {
                 Saldo -= valor;
+                Console.WriteLine($"Saldo: {Saldo}");
             }
             
         }
@@ -74,10 +80,7 @@ namespace Bank.Models
             decimal renda;
 
             renda = Titular.RendaMensal ?? 0; // a renda pode ser nula então deve-se tratar esse erro
-
-            //== adicione o saldo devedor lá em cima como uma variável de dados == 
            
-
             if (valor <= 0 || valor > renda * (1.30m))
             {
                 Console.WriteLine("Valor inválido ou superior ao limtie de crédito mensal");
@@ -85,6 +88,7 @@ namespace Bank.Models
             else
             {
                 Saldo += valor;
+                Saldo_devedor += valor * 1.12m; // O valor do empréstimo mais os juros de 12% (valor * 1.12)
                 Console.WriteLine($"Empréstimo concedido no valor de {valor:C}. \nSaldo atual: {Saldo:C}. \nSaldo devedor: {valor * 1.12m:C}");
             }
             

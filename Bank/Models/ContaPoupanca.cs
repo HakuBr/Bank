@@ -7,6 +7,7 @@ namespace Bank.Models
     public class ContaPoupanca : Account
     {
         public ContaPoupanca(Users titular) : base(titular) { }
+        public override string TipoConta => "Conta Poupança";
 
         public void Investimento()
         {

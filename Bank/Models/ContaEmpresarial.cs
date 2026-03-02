@@ -6,6 +6,7 @@ namespace Bank.Models
 {
     public class ContaEmpresarial : Account
     {
+        public override string TipoConta => "Conta Empresarial";
 
         public ContaEmpresarial(Users titular) : base(titular) { }
 

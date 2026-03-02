@@ -9,6 +9,8 @@ namespace Bank.Models
     {
         private const decimal taxa_saque = 0.05m;
 
+        public override string TipoConta => "Conta Corrente"; // Propriedade somente leitura que retorna o tipo da conta, usando expressão lambda para retornar a string
+
         public ContaCorrente(Users titular) : base(titular) { } // Usa um campo (titular) do constructor da classe-mãe como campo da classe filha
 
         public override void Sacar(decimal valor)

@@ -12,6 +12,7 @@ namespace Bank.Services
 
 
         public List<Account> Contas { get; } = new();
+        
         private List<Users> usuarios = new();
 
 
@@ -26,6 +27,8 @@ namespace Bank.Services
                 Console.WriteLine("Escolha uma das opções: ");
                 string op = Console.ReadLine();
 
+                Console.Clear();
+
                 switch (op)
                 {
                     case "1":
@@ -35,9 +38,10 @@ namespace Bank.Services
                         Cadastro();
                         break;
                     case "0":
-                        // ==como fechar o programa caso ele digite 0?==
+                        
                         Console.WriteLine("Programa encerrado");
-                        return; // o return encerra a excecução do método/função inteiro 
+                        Environment.Exit(0); // Força o programa inteiro a fechar
+                        break; // o return encerra a excecução do método/função inteiro 
                     default:
                         Console.WriteLine("Opção inválida");
                         break;
@@ -63,22 +67,33 @@ namespace Bank.Services
                 Console.WriteLine("0- Deletar a conta");
                 Console.WriteLine("Escolha uma das opções: ");
 
-                string op = Console.ReadLine();
-                switch (op)
+                Account? conta = Contas.Find(c => c.Titular == UsuarioLogado);
+                if (conta == null)
                 {
+                    Console.WriteLine("Conta não encontrada. Redirecionando para o menu principal.");
+                    Menu();
+                    return;
+                }
 
 
-                    //== como garantir um console limpo quando ele trocar de opção? ==
+                string op = Console.ReadLine();
+
+                Console.Clear();
+
+                switch (op)
+                { 
+                    
                     //== a tratativa do valor digitado, para não dar erro caso ele digite uma letra ou um símbolo deve ser aqui ou dentro do método? ==
 
                     case "1":
-                        Account conta = Contas.Find(c => c.Titular == UsuarioLogado);
+                        
                         conta.Dados();
+                        Console.ReadKey();
                         break;
                     case "2":
-                        // == mostre o conta.Dados.Saldo == 
                         decimal deposit_value;
                         Console.WriteLine("Quanto você deseja depositar?");
+                        Console.WriteLine($"Saldo: {conta.Saldo:C}");
                         Console.WriteLine("Valor: ");
                         while (!decimal.TryParse(Console.ReadLine(), out deposit_value))  // Tenta converter o input em decimal (ou qualquer outro tipo) e retorna um bool armazenando o input na variável, 
                         {
@@ -87,11 +102,13 @@ namespace Bank.Services
                         }
                         Account origin_deposit_account = Contas.Find(c => c.Titular == UsuarioLogado);
                         origin_deposit_account.Depositar(deposit_value);
+                        Console.ReadKey();
                         break;
 
                     case "3":
                         decimal value;
                         Console.WriteLine("Quanto você deseja transferir?");
+                        Console.WriteLine($"Saldo: {conta.Saldo:C}");
                         Console.WriteLine("Valor: ");
 
                         while (!decimal.TryParse(Console.ReadLine(), out value))  // Tenta converter o input em decimal (ou qualquer outro tipo) e retorna um bool armazenando o input na variável, 
@@ -101,16 +118,19 @@ namespace Bank.Services
                         }                                // se retornar false quer dizer que não foi possivel transformar, então não é um decimal, então não é um número, inverter o valor (true) faz o while funcionar
 
                         Console.WriteLine("Digite o CPF do recebedor: ");
-                        string recedor = Console.ReadLine();
+                        string recedor = Console.ReadLine() ?? "";
                         Account conta_destino = Contas.Find(c => c.Titular.Cpf == recedor);
                         Account conta_origem = Contas.Find(c => c.Titular == UsuarioLogado);
                         conta_origem.TransferirPara(conta_destino, value);
-
+                        Console.ReadKey();
                         break;
 
                         
                     case "4":
                         decimal loan_value;
+
+                        Console.WriteLine($"Saldo: {conta.Saldo:C}");
+                        Console.WriteLine($"Saldo Devedor: {conta.Saldo_devedor:C}");
                         Console.WriteLine("Quanto você deseja de empréstimo?");
                         Console.WriteLine("Valor: ");
                         while (!decimal.TryParse(Console.ReadLine(), out loan_value))  // Tenta converter o input em decimal (ou qualquer outro tipo) e retorna um bool armazenando o input na variável, 
@@ -120,7 +140,9 @@ namespace Bank.Services
                         }
                         Account origin_loan_account = Contas.Find(c => c.Titular == UsuarioLogado);
                         origin_loan_account.Emprestimo(loan_value);
+                        Console.ReadKey();
                         break;
+
                     case "5":
                         decimal take_out_value;
                         Console.WriteLine("Quanto você deseja sacar?");
@@ -132,18 +154,20 @@ namespace Bank.Services
                         }
                         Account origin_take_out_account = Contas.Find(c => c.Titular == UsuarioLogado);
                         origin_take_out_account.Sacar(take_out_value);
+                        Console.ReadKey();
                         break;
+
                     case "6":
                         Menu();
                         return;
+
                     case "0":
                         DeletarConta();
                         return;
+
                     default:
                         Console.WriteLine("Opção inválida");
                         break;
-
-
                 }
             }
 
@@ -155,37 +179,43 @@ namespace Bank.Services
         {
 
             // == O usuário deve decidir qual tipo de conta ele quer ==
-            // == Ele deve poder voltar para o login ==
-            Console.WriteLine("==Cadastro==");
-            string nome = ValidarNome();
-            string cpf = ValidarCPF();
-            string email = ValidarEmail();
-            string senha = ValidarSenha();
-            decimal rendamensal = ValidarRenda();
-            int idade = ValidarIdade();
-            string cnpj = ValidarCNPJ();
+            Console.WriteLine("==Cadastro (Digite 0 para sair)==");
+            string op = Console.ReadLine() ?? "";
+            if (op == "0") 
+            { 
+                Menu();
+            }
+            else
+            {
+                string nome = ValidarNome();
+                string cpf = ValidarCPF();
+                string email = ValidarEmail();
+                string senha = ValidarSenha();
+                decimal rendamensal = ValidarRenda();
+                int idade = ValidarIdade();
+                string cnpj = ValidarCNPJ();
 
-            Users novo = new Users(nome, cpf, email, senha, rendamensal, idade, cnpj);
-            Account conta = new ContaCorrente(novo);
-            usuarios.Add(novo);
-            Contas.Add(conta);
-            Console.WriteLine("Cadastro realizado com sucesso");
-            Login();
+                Users novo = new Users(nome, cpf, email, senha, rendamensal, idade, cnpj);
+                Account conta = new ContaCorrente(novo);
+                usuarios.Add(novo);
+                Contas.Add(conta);
+                Console.WriteLine("Cadastro realizado com sucesso");
+                Login();
+            }
         }
 
-        public Users Login()
+        public Users? Login()
         {
-            Users user;
+            Users? user_cpf;
             bool autenticado = false;
 
             //== ValidarCPF() deve estar aqui? ==
-            //== Se o usuário não tiver conta deve ser redirecionado para o cadastro == 
 
             do
             {
                 Console.WriteLine("==Login==");
                 Console.WriteLine("CPF (Digite 0 para sair): ");
-                string cpf = Console.ReadLine();
+                string cpf = Console.ReadLine() ?? "";
                 if (cpf == "0")
                 {
                     Menu();
@@ -193,52 +223,66 @@ namespace Bank.Services
                 }
 
                 Console.WriteLine("Senha: ");
-                string senha = Console.ReadLine();
+                string senha = Console.ReadLine() ?? "";
 
-                user = usuarios.Find(u => u.Cpf == cpf && u.Senha == senha);
+                user_cpf = usuarios.Find(u => u.Cpf == cpf);
 
-                if (user == null)
+                if (user_cpf == null)
                 {
-                    Console.WriteLine("CPF ou senha incorreta");
+                    Console.WriteLine("CPF não cadastrado. Redirecionando para o cadastro");
+                    Cadastro();
+                    return null;
+                }
+                else if (user_cpf.Senha != senha)
+                {
+                    Console.WriteLine("Senha incorreta");
                 }
                 else
                 {
                     autenticado = true;
-                    UsuarioLogado = user;
+                    UsuarioLogado = user_cpf;
                     Console.WriteLine("Login realizado com sucesso");
+                    Console.ReadKey();
                     MenuLogado();
                 }
             } while (!autenticado);
-            Console.Clear();
-            return user;
+            return user_cpf;
         }
 
         public void DeletarConta()
         {
-            //==Se a pessoa selecionou errado e quiser voltar?==
             Console.Clear();
             Users user = null;
             bool authentication = false;
-            Console.WriteLine("Digite seu cpf: ");
-            string cpf = Console.ReadLine();
-            user = usuarios.Find(u => u.Cpf == cpf);
-
-            do
+            Console.WriteLine("Tem certeza que quer deletar a conta?? (Digite 0 para voltar)");
+            string op = Console.ReadLine() ?? "";
+            if (op == "0")
             {
-                Console.WriteLine("Digite sua senha: ");
-                string senha = Console.ReadLine();
+                MenuLogado();
+                return;
+            }
+            else
+            {
+
+                Console.WriteLine("Digite seu cpf: ");
+                string cpf = Console.ReadLine() ?? "";
+                user = usuarios.Find(u => u.Cpf == cpf);
+
+                do
+                {
+                    Console.WriteLine("Digite sua senha: ");
+                    string senha = Console.ReadLine();
 
 
-                if (user.Senha == senha)
-                    authentication = true;
-                else
-                    Console.WriteLine("Senha incorreta. Tente novamente");
-            } while (!authentication);
+                    if (user.Senha == senha)
+                        authentication = true;
+                    else
+                        Console.WriteLine("Senha incorreta. Tente novamente");
+                } while (!authentication);
 
-            usuarios.Remove(user);
-            Console.WriteLine("Conta apagada com sucesso");
-            Console.Clear();
-            
+                usuarios.Remove(user);
+                Console.WriteLine("Conta apagada com sucesso");
+            }
         }
 
         private string ValidarNome()
@@ -263,9 +307,20 @@ namespace Bank.Services
             do
             {
                 Console.WriteLine("Digite seu CPF: ");
-                CPF = Console.ReadLine();
-                CPFValido = CPF.Length == 11 && CPF.All(char.IsDigit) && !usuarios.Any(u => u.Cpf == CPF);
-                if (!CPFValido) Console.WriteLine("CPF inválido ou já cadastrado");
+                CPF = Console.ReadLine() ?? "";
+
+                CPFValido = CPF.Length == 11 && CPF.All(char.IsDigit);
+
+                if (!CPFValido)
+                {
+                    Console.WriteLine("CPF inválido");
+                }
+                else if (usuarios.Any(u => u.Cpf == CPF))
+                {
+                    Console.WriteLine("CPF já cadastrado");
+                    Login();
+                    return "";
+                }
             } while (!CPFValido);
             return CPF;
         }
@@ -277,7 +332,7 @@ namespace Bank.Services
             do
             {
                 Console.WriteLine("Digite seu email: ");
-                email = Console.ReadLine();
+                email = Console.ReadLine() ?? "";
                 emailValido = !string.IsNullOrWhiteSpace(email) && email.Contains("@") && email.Contains(".");
                 if (!emailValido) Console.WriteLine("Email inválido");
             } while (!emailValido);
@@ -303,12 +358,13 @@ namespace Bank.Services
             bool idadeValida;
             do
             {
-                // ==se for menor de idade o programa deve sair do login==
                 Console.WriteLine("Digite sua idade: ");
                 idadeValida = int.TryParse(Console.ReadLine(), out idade) && idade >= 18;
                 if (!idadeValida)
                 {
-                    Console.WriteLine("Você deve ser maior de idade para acessar o sistema");
+                    Console.WriteLine("Você deve ser maior de idade para acessar o sistema. Valeu aí");
+                    Console.ReadKey();
+                    Environment.Exit(0); // Força o programa inteiro a fechar
                     break;
                 }
 
@@ -322,7 +378,7 @@ namespace Bank.Services
             do
             {
                 Console.WriteLine("Digite seu CNPJ (Se tiver): ");
-                cnpj = Console.ReadLine();
+                cnpj = Console.ReadLine() ?? "";
                 if (string.IsNullOrEmpty(cnpj)) cnpjValido = true;
                 else cnpjValido = cnpj.Length == 14 && cnpj.All(char.IsDigit);
                 if (!cnpjValido) Console.Write("CNPJ inválido");
@@ -335,13 +391,15 @@ namespace Bank.Services
             string senha;
             bool senhaValida;
 
-            //== a senha deve ter pelo menos oitos caracteres == 
             do
             {
                 Console.WriteLine("Crie uma senha: ");
-                senha = Console.ReadLine();
-                senhaValida = !string.IsNullOrWhiteSpace(senha);
-                if (!senhaValida) Console.WriteLine("A senha não pode ser vazia");
+                senha = Console.ReadLine() ?? "";
+                senhaValida = !string.IsNullOrWhiteSpace(senha) && senha.Length >= 8;
+                if (!senhaValida)
+                {
+                    Console.WriteLine("A senha não pode ser vazia ou menor que oitos caracteres");
+                }
             } while (!senhaValida);
             return senha;
         }
